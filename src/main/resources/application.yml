@@ -1,1 +1,16 @@
+server:
+  port: 8081
 
+spring:
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          lob.non_contextual_creation: true
+        hbm2ddl:
+          auto: update
+        format_sql: true
+    show-sql: true
+
+logging.level.org.hibernate.SQL: INFO
+logging.level.org.hibernate.type.descriptor.sql.BasicBinder: TRACE
