@@ -29,7 +29,10 @@ public class FirebaseMessageService {
         }
     }
 
-    public String sendSingleMessage(String registrationToken, String title, String body, Map<String, String> allData) throws FirebaseMessagingException, IOException {
+    public String sendSingleMessage(String registrationToken,
+                                    String title,
+                                    String body,
+                                    Map<String, String> allData) throws FirebaseMessagingException, IOException {
         provideUserAuthInfo();
 
         Message message = Message.builder()
@@ -37,6 +40,7 @@ public class FirebaseMessageService {
                         .setTitle(title)
                         .setBody(body)
                         .build())
+                .putAllData(allData)
                 .putData("score", "850")
                 .putData("time", "2:45")
                 .setToken(registrationToken)
@@ -45,7 +49,10 @@ public class FirebaseMessageService {
         return FirebaseMessaging.getInstance().send(message);
     }
 
-    public void sendMulticastMessage(List<String> registrationTokens, String title, String body) throws IOException, FirebaseMessagingException {
+    public void sendMulticastMessage(List<String> registrationTokens,
+                                     String title,
+                                     String body,
+                                     Map<String, String> allData) throws IOException, FirebaseMessagingException {
         provideUserAuthInfo();
 
         MulticastMessage message = MulticastMessage.builder()

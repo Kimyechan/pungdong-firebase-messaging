@@ -1,6 +1,7 @@
 package com.diving.firebasemessaging.kafka;
 
 import com.diving.firebasemessaging.domain.FirebaseToken;
+import com.diving.firebasemessaging.kafka.dto.reservation.NotificationCreateInfo;
 import com.diving.firebasemessaging.kafka.dto.reservation.ReservationCancelInfo;
 import com.diving.firebasemessaging.kafka.dto.reservation.ReservationCreateInfo;
 import com.diving.firebasemessaging.repo.FirebaseTokenJpaRepo;
@@ -11,7 +12,9 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -48,5 +51,20 @@ public class ReservationKafkaConsumer {
         allData.put("scheduleId", info.getScheduleId());
 
         firebaseMessageService.sendSingleMessage(firebaseTokenValue, title, info.getMessageBody(), allData);
+    }
+
+    @KafkaListener(topics = "lecture-notification")
+    public void consumeLectureNotification(NotificationCreateInfo info) throws IOException, FirebaseMessagingException {
+        List<String> firebaseTokens = new ArrayList<>();
+        for (String applicantId : info.getApplicantIds()) {
+            FirebaseToken firebaseToken = firebaseTokenJpaRepo.findById(Long.valueOf(applicantId))
+                    .orElse(null);
+            firebaseTokens.add(firebaseToken.getToken());
+        }
+
+        Map<String, String> allData = new HashMap<>();
+        allData.put("lectureId", info.getLectureId());
+
+        firebaseMessageService.sendMulticastMessage(firebaseTokens, info.getTitle(), info.getBody(), allData);
     }
 }
