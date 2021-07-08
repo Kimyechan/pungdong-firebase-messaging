@@ -1,4 +1,4 @@
-package com.diving.firebasemessaging.kafka;
+package com.diving.firebasemessaging.kafka.dto.firebaseToken;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class FirebaseMessageService {
         }
     }
 
-    public String sendSingleMessage(String registrationToken, String title, String body) throws FirebaseMessagingException, IOException {
+    public String sendSingleMessage(String registrationToken, String title, String body, Map<String, String> allData) throws FirebaseMessagingException, IOException {
         provideUserAuthInfo();
 
         Message message = Message.builder()

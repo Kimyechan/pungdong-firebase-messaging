@@ -1,6 +1,7 @@
 package com.diving.firebasemessaging.kafka;
 
 import com.diving.firebasemessaging.domain.FirebaseToken;
+import com.diving.firebasemessaging.kafka.dto.firebaseToken.FirebaseTokenInfo;
 import com.diving.firebasemessaging.repo.FirebaseTokenJpaRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class FirebaseTokenConsumer {
     private final FirebaseTokenJpaRepo firebaseTokenJpaRepo;
 
-    @KafkaListener(topics = "firebase-token", groupId = "group_id")
+    @KafkaListener(topics = "firebase-token")
     public void consume(FirebaseTokenInfo firebaseTokenInfo) {
         FirebaseToken firebaseToken = FirebaseToken.builder()
                 .id(Long.valueOf(firebaseTokenInfo.getId()))
