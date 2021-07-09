@@ -1,6 +1,7 @@
 package com.diving.firebasemessaging.kafka;
 
 import com.diving.firebasemessaging.domain.FirebaseToken;
+import com.diving.firebasemessaging.kafka.dto.comment.CommentCommentCreateInfo;
 import com.diving.firebasemessaging.kafka.dto.comment.CommentCreateInfo;
 import com.diving.firebasemessaging.repo.FirebaseTokenJpaRepo;
 import com.diving.firebasemessaging.service.FirebaseMessageService;
@@ -10,7 +11,9 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -31,5 +34,23 @@ public class CommentKafkaConsumer {
         allData.put("postId", info.getPostId());
 
         firebaseMessageService.sendSingleMessage(tokenValue, title, body, allData);
+    }
+
+    @KafkaListener(topics = "create-comment-comment")
+    public void consumeCommentCommentCreateEvent(CommentCommentCreateInfo info) throws IOException, FirebaseMessagingException {
+        String title = "댓글이 달렸습니다.";
+        String body = info.getCommentCommentWriterNickname() + "님이 " + "댓글을 달았습니다";
+
+        FirebaseToken postWriterToken = firebaseTokenJpaRepo.findById(Long.valueOf(info.getPostWriterId())).orElseThrow(null);
+        FirebaseToken commentWriterToken = firebaseTokenJpaRepo.findById(Long.valueOf(info.getCommentWriterId())).orElseThrow(null);
+
+        List<String> tokenValues = new ArrayList<>();
+        tokenValues.add(postWriterToken.getToken());
+        tokenValues.add(commentWriterToken.getToken());
+
+        Map<String, String> allData = new HashMap<>();
+        allData.put("postId", info.getPostId());
+
+        firebaseMessageService.sendMulticastMessage(tokenValues, title, body, allData);
     }
 }
