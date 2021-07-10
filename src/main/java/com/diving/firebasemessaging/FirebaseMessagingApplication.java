@@ -1,5 +1,9 @@
 package com.diving.firebasemessaging;
 
+import org.apache.kafka.clients.producer.Producer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.kafka.ConcurrentKafkaListenerContainerFactoryConfigurer;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -28,20 +32,5 @@ public class FirebaseMessagingApplication {
         new SpringApplicationBuilder(FirebaseMessagingApplication.class)
                 .properties(APPLICATION_LOCATIONS)
                 .run(args);
-    }
-
-    @Bean
-    public RecordMessageConverter converter() {
-        return new StringJsonMessageConverter();
-    }
-
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory kafkaListenerContainerFactory(ConcurrentKafkaListenerContainerFactoryConfigurer configurer,
-                                                                                 ConsumerFactory<Object, Object> kafkaConsumerFactory,
-                                                                                 KafkaTemplate<Object, Object> template) {
-        ConcurrentKafkaListenerContainerFactory<Object, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        configurer.configure(factory, kafkaConsumerFactory);
-        factory.setErrorHandler(new SeekToCurrentErrorHandler(new DeadLetterPublishingRecoverer(template), new FixedBackOff(1000L, 2)));
-        return factory;
     }
 }

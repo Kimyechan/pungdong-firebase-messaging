@@ -1,6 +1,7 @@
 package com.diving.firebasemessaging.kafka;
 
 import com.diving.firebasemessaging.domain.FirebaseToken;
+import com.diving.firebasemessaging.exception.ResourceNotFoundException;
 import com.diving.firebasemessaging.kafka.dto.reservation.NotificationCreateInfo;
 import com.diving.firebasemessaging.kafka.dto.reservation.ReservationCancelInfo;
 import com.diving.firebasemessaging.kafka.dto.reservation.ReservationCreateInfo;
@@ -26,7 +27,7 @@ public class ReservationKafkaConsumer {
     @KafkaListener(topics = "create-reservation")
     public void consumeReservationCreateInfo(ReservationCreateInfo info) throws IOException, FirebaseMessagingException {
         FirebaseToken firebaseToken = firebaseTokenJpaRepo.findById(Long.valueOf(info.getInstructorId()))
-                .orElse(null);
+                .orElseThrow(ResourceNotFoundException::new);
 
         String firebaseTokenValue = firebaseToken.getToken();
         String title = "강의를 예약했습니다.";
@@ -41,7 +42,7 @@ public class ReservationKafkaConsumer {
     @KafkaListener(topics = "cancel-reservation")
     public void consumeReservationCancelInfo(ReservationCancelInfo info) throws IOException, FirebaseMessagingException {
         FirebaseToken firebaseToken = firebaseTokenJpaRepo.findById(Long.valueOf(info.getInstructorId()))
-                .orElse(null);
+                .orElseThrow(ResourceNotFoundException::new);
 
         String firebaseTokenValue = firebaseToken.getToken();
         String title = "강의 예약을 취소했습니다.";
@@ -58,7 +59,7 @@ public class ReservationKafkaConsumer {
         List<String> firebaseTokens = new ArrayList<>();
         for (String applicantId : info.getApplicantIds()) {
             FirebaseToken firebaseToken = firebaseTokenJpaRepo.findById(Long.valueOf(applicantId))
-                    .orElse(null);
+                    .orElseThrow(ResourceNotFoundException::new);
             firebaseTokens.add(firebaseToken.getToken());
         }
 
